@@ -1,6 +1,6 @@
 ## AppUp
 
-**Maintainers:** [mdeboer](https://github.com/mdeboer)
+The command that can save you typing 15 characters or more, each time!
 
 This plugins adds `start`, `stop`, `up` and `down` commands when it detects a docker-compose or Vagrant file in the current directory (e.g. your application). Just run `up` and get coding!
 
