@@ -1,6 +1,21 @@
 # Docker
 _appup_docker () {
-    if type docker-compose >/dev/null 2>&1; then
+    if command -v docker-compose >/dev/null 2>&1; then
+        # Check if docker-machine has been started
+        if command -v docker-machine >/dev/null 2>&1; then            
+            if docker-machine status | grep -qi "Stopped"; then
+                read -q "REPLY?Docker Machine is not running, would you like to start it? [y/n] "
+                echo ""
+                
+                if [[ "$REPLY" == "y" ]]; then
+                    docker-machine start default && eval $(docker-machine env default)
+                    echo ""
+                else
+                    return
+                fi
+            fi
+        fi
+        
         # <cmd> <project name> will look for docker-compose.<project name>.yml
         if [ -n "$2" -a -e "docker-compose.$2.yml" ]; then
             project=$(source ".env.$2"; echo $COMPOSE_PROJECT_NAME)
