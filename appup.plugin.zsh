@@ -29,6 +29,18 @@ _appup_docker () {
             return
         fi
 
+        if [ -n "$2" -a -e "docker-compose.$2.yaml" ]; then
+            project=$(source ".env.$2"; echo $COMPOSE_PROJECT_NAME)
+
+            if [ -n $project ]; then
+                docker-compose -p "${project}" -f docker-compose.yaml -f "docker-compose.${2}.yaml" $1 "${@:3}"
+                return
+            fi
+
+            docker-compose -f docker-compose.yaml -f "docker-compose.${2}.yaml" $1 "${@:3}"
+            return
+        fi
+
         docker-compose $1 "${@:2}"
     else
         echo >&2 "Docker compose file found but docker-compose is not installed."
@@ -45,7 +57,7 @@ _appup_vagrant () {
 }
 
 up () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker up "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant up "$@"
@@ -55,7 +67,7 @@ up () {
 }
 
 down () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker down "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant destroy "$@"
@@ -65,7 +77,7 @@ down () {
 }
 
 start () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker start "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant resume "$@"
@@ -75,7 +87,7 @@ start () {
 }
 
 stop () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker stop "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant suspend "$@"
