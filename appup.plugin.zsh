@@ -87,7 +87,7 @@ start () {
 }
 
 restart () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker restart "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant reload "$@"
