@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/Cloudstek/zsh-plugin-appup.svg?branch=master)](https://travis-ci.org/Cloudstek/zsh-plugin-appup)
 
-This plugins adds `start`, `restart`, `stop`, `up` and `down` commands when it detects a docker-compose or Vagrant file in the current directory (e.g. your application). Just run `up` and get coding!
+This plugins adds `start`, `restart`, `stop`, `up` and `down` commands when it detects a docker-compose or Vagrant file in the current directory (e.g. your application). Just run `up` and get coding! This saves you typing `docker-compose` or `vagrant` every time or aliasing them. Also gives you one set of commands that work for both environments.
 
 ### Docker
 
@@ -14,7 +14,7 @@ Aside from simply running `up`, you can also extend your configuration by runnin
 
 Vagrant doesn't have a `down`, `restart`, `start` or `stop` commands natively but don't worry, that's been taken care of and running those commands will actually run vagrant's equivalent commands. Additional arguments will be directly supplied to vagrant.
 
-## Command mapping
+### Command mapping
 
 | Command | Vagrant command                                            | Docker command                                               |
 | ------- | ---------------------------------------------------------- | ------------------------------------------------------------ |
@@ -24,3 +24,28 @@ Vagrant doesn't have a `down`, `restart`, `start` or `stop` commands natively bu
 | restart | [reload](https://www.vagrantup.com/docs/cli/reload.html)   | [restart](https://docs.docker.com/compose/reference/restart/) |
 | stop    | [halt](https://www.vagrantup.com/docs/cli/halt.html)       | [stop](https://docs.docker.com/compose/reference/stop/)      |
 
+## Installation
+
+### oh-my-zsh
+
+1. Clone this repository in `$ZSH_CUSTOM/plugins/appup`:
+
+   ```bash
+   git clone https://github.com/Cloudstek/zsh-plugin-appup.git "$ZSH_CUSTOM/plugins/appup"
+   ```
+2. Edit `~/.zshrc` and add `appup` to the list of plugins
+
+### Plain ZSH
+
+1. Clone this repository somewhere
+
+2. Edit your `~/.zshrc` and add this line near the bottom of the file:
+
+   ```bash
+   source path/to/the/repository/appup.plugin.zsh
+   ```
+
+## Updating
+
+1. Go to the directory where you cloned the plugin repository
+2. Run `git pull origin master`
