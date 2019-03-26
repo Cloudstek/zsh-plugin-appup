@@ -2,6 +2,8 @@
 
 > The command that can save you typing 15 characters or more, each time!
 
+[![Build Status](https://travis-ci.org/Cloudstek/zsh-plugin-appup.svg?branch=master)](https://travis-ci.org/Cloudstek/zsh-plugin-appup)
+
 This plugins adds `start`, `restart`, `stop`, `up` and `down` commands when it detects a docker-compose or Vagrant file in the current directory (e.g. your application). Just run `up` and get coding!
 
 ### Docker
