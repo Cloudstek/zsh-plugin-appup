@@ -1,0 +1,120 @@
+#!/usr/bin/env zunit
+
+@setup {
+    load _support/docker
+    load ../appup.plugin.zsh
+    
+    _tmp_setup
+}
+
+@teardown {
+    _tmp_teardown
+}
+
+@test 'Docker stop' {
+    _setup_simple_env
+
+    run stop
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose stop'
+}
+
+@test 'Docker stop (with arguments)' {
+    _setup_simple_env
+
+    run stop mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose stop mysql -v'
+}
+
+@test 'Docker stop (without docker-compose file)' {
+    run stop
+    
+    assert $state equals 0
+    assert "$output" is_empty
+}
+
+@test 'Docker stop (with arguments, without docker-compose file)' {
+    run stop mysql
+    
+    assert $state equals 0
+    assert "$output" is_empty
+}
+
+@test 'Docker stop (with project)' {
+    _setup_project_env foobar
+
+    run stop foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yml stop'
+}
+
+@test 'Docker stop (with project and arguments)' {
+    _setup_project_env foobar
+
+    run stop foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yml stop mysql -v'
+}
+
+@test 'Docker stop (with project, yaml extension)' {
+    _setup_project_env foobar yaml
+
+    run stop foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yaml -f docker-compose.foobar.yaml stop'
+}
+
+@test 'Docker stop (with project and arguments, yaml extension)' {
+    _setup_project_env foobar yaml
+
+    run stop foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yaml -f docker-compose.foobar.yaml stop mysql -v'
+}
+
+@test 'Docker stop (with project, yml/yaml extensions)' {
+    _setup_project_env foobar yaml
+    mv $APPUP_TMP/docker-compose.yaml $APPUP_TMP/docker-compose.yml
+
+    run stop foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yaml stop'
+}
+
+@test 'Docker stop (with project and arguments, yml/yaml extensions)' {
+    _setup_project_env foobar yaml
+    mv $APPUP_TMP/docker-compose.yaml $APPUP_TMP/docker-compose.yml
+
+    run stop foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yaml stop mysql -v'
+}
+
+@test 'Docker stop (with custom project name)' {
+    _setup_project_env foobar
+    echo "COMPOSE_PROJECT_NAME=test-project" > $APPUP_TMP/.env.foobar
+
+    run stop foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -p test-project -f docker-compose.yml -f docker-compose.foobar.yml stop'
+}
+
+@test 'Docker stop (with custom project name and arguments)' {
+    _setup_project_env foobar
+    echo "COMPOSE_PROJECT_NAME=test-project" > $APPUP_TMP/.env.foobar
+
+    run stop foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -p test-project -f docker-compose.yml -f docker-compose.foobar.yml stop mysql -v'
+}

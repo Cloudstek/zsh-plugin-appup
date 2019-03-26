@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+
+if [ -z "$TERM" ]; then
+  export TERM=xterm
+fi
+
+export APPUP_TMP=/tmp/appup_test
+export PATH="${PWD}/tests/_support/bin:${PATH}"
+
+_tmp_setup () {
+    rm -Rf $APPUP_TMP
+    mkdir $APPUP_TMP
+}
+
+_tmp_teardown () {
+    rm -Rf $APPUP_TMP
+}

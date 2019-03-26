@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: debian
+    steps:
+      - checkout
+      - run:
+          name: Install zsh
+          command: |
+            apt-get update
+            apt-get install -y --no-install-recommends zsh curl ca-certificates
+      - run:
+          name: Install zunit
+          command: |
+            curl -L https://github.com/zunit-zsh/zunit/releases/download/v0.8.2/zunit > /usr/local/bin/zunit
+            curl -L https://raw.githubusercontent.com/molovo/revolver/master/revolver > /usr/local/bin/revolver
+            curl -L https://raw.githubusercontent.com/molovo/color/master/color.zsh > /usr/local/bin/color
+            chmod +x /usr/local/bin/{color,revolver,zunit}
+            chmod +x tests/_support/bin/*
+      - run:
+          name: Run tests
+          command: zunit
+  
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test

@@ -1,0 +1,120 @@
+#!/usr/bin/env zunit
+
+@setup {
+    load _support/docker
+    load ../appup.plugin.zsh
+    
+    _tmp_setup
+}
+
+@teardown {
+    _tmp_teardown
+}
+
+@test 'Docker up' {
+    _setup_simple_env
+
+    run up
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose up'
+}
+
+@test 'Docker up (with arguments)' {
+    _setup_simple_env
+
+    run up mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose up mysql -v'
+}
+
+@test 'Docker up (without docker-compose file)' {
+    run up
+    
+    assert $state equals 0
+    assert "$output" is_empty
+}
+
+@test 'Docker up (with arguments, without docker-compose file)' {
+    run up mysql
+    
+    assert $state equals 0
+    assert "$output" is_empty
+}
+
+@test 'Docker up (with project)' {
+    _setup_project_env foobar
+
+    run up foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yml up'
+}
+
+@test 'Docker up (with project and arguments)' {
+    _setup_project_env foobar
+
+    run up foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yml up mysql -v'
+}
+
+@test 'Docker up (with project, yaml extension)' {
+    _setup_project_env foobar yaml
+
+    run up foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yaml -f docker-compose.foobar.yaml up'
+}
+
+@test 'Docker up (with project and arguments, yaml extension)' {
+    _setup_project_env foobar yaml
+
+    run up foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yaml -f docker-compose.foobar.yaml up mysql -v'
+}
+
+@test 'Docker up (with project, yml/yaml extensions)' {
+    _setup_project_env foobar yaml
+    mv $APPUP_TMP/docker-compose.yaml $APPUP_TMP/docker-compose.yml
+
+    run up foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yaml up'
+}
+
+@test 'Docker up (with project and arguments, yml/yaml extensions)' {
+    _setup_project_env foobar yaml
+    mv $APPUP_TMP/docker-compose.yaml $APPUP_TMP/docker-compose.yml
+
+    run up foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yaml up mysql -v'
+}
+
+@test 'Docker up (with custom project name)' {
+    _setup_project_env foobar
+    echo "COMPOSE_PROJECT_NAME=test-project" > $APPUP_TMP/.env.foobar
+
+    run up foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -p test-project -f docker-compose.yml -f docker-compose.foobar.yml up'
+}
+
+@test 'Docker up (with custom project name and arguments)' {
+    _setup_project_env foobar
+    echo "COMPOSE_PROJECT_NAME=test-project" > $APPUP_TMP/.env.foobar
+
+    run up foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -p test-project -f docker-compose.yml -f docker-compose.foobar.yml up mysql -v'
+}

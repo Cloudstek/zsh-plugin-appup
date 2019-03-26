@@ -1,0 +1,44 @@
+#!/usr/bin/env zunit
+
+@setup {
+    load _support/vagrant
+    load ../appup.plugin.zsh
+    
+    _tmp_setup
+}
+
+@teardown {
+    _tmp_teardown
+}
+
+@test 'Vagrant stop' {
+    _setup_simple_env
+
+    run stop
+    
+    assert $state equals 0
+    assert "$output" same_as 'vagrant halt'
+}
+
+@test 'Vagrant stop (with arguments)' {
+    _setup_simple_env
+
+    run stop mysql -f
+    
+    assert $state equals 0
+    assert "$output" same_as 'vagrant halt mysql -f'
+}
+
+@test 'Vagrant stop (without vagrant file)' {
+    run stop
+    
+    assert $state equals 0
+    assert "$output" is_empty
+}
+
+@test 'Vagrant stop (with arguments, without vagrant file)' {
+    run stop mysql -f
+    
+    assert $state equals 0
+    assert "$output" is_empty
+}

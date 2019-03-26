@@ -16,17 +16,38 @@ _appup_docker () {
             fi
         fi
         
+        # Check YAML extension
+        compose_file=''
+        compose_project_file=''
+        
+        if [ -e "docker-compose.yml" ]; then
+            compose_file='docker-compose.yml'
+        elif [ -e "docker-compose.yaml" ]; then
+            compose_file='docker-compose.yaml'
+        fi
+        
         # <cmd> <project name> will look for docker-compose.<project name>.yml
-        if [ -n "$2" -a -e "docker-compose.$2.yml" ]; then
-            project=$(source ".env.$2"; echo $COMPOSE_PROJECT_NAME)
+        if [ -n "$2" ]; then
+            if [ -e "docker-compose.$2.yml" ]; then
+                compose_project_file="docker-compose.$2.yml"
+            elif [ -e "docker-compose.$2.yaml" ]; then
+                compose_project_file="docker-compose.$2.yaml"
+            fi
+            
+            if [ -n "$compose_project_file" ]; then 
+                # Override project name from custom env
+                if [ -e ".env.$2" ]; then
+                    project=$(source ".env.$2"; echo $COMPOSE_PROJECT_NAME)
 
-            if [ -n $project ]; then
-                docker-compose -p "${project}" -f docker-compose.yml -f "docker-compose.${2}.yml" $1 "${@:3}"
+                    if [ -n $project ]; then
+                        docker-compose -p "${project}" -f "$compose_file" -f "$compose_project_file" $1 "${@:3}"
+                        return
+                    fi
+                fi
+
+                docker-compose -f "$compose_file" -f "$compose_project_file" $1 "${@:3}"
                 return
             fi
-
-            docker-compose -f docker-compose.yml -f "docker-compose.${2}.yml" $1 "${@:3}"
-            return
         fi
 
         docker-compose $1 "${@:2}"
@@ -45,7 +66,7 @@ _appup_vagrant () {
 }
 
 up () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker up "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant up "$@"
@@ -55,7 +76,7 @@ up () {
 }
 
 down () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker down "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant destroy "$@"
@@ -65,7 +86,7 @@ down () {
 }
 
 start () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker start "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant up "$@"
@@ -75,7 +96,7 @@ start () {
 }
 
 restart () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker restart "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant reload "$@"
@@ -85,7 +106,7 @@ restart () {
 }
 
 stop () {
-    if [ -e "docker-compose.yml" ]; then
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker stop "$@"
     elif [ -e "Vagrantfile" ]; then
         _appup_vagrant halt "$@"
