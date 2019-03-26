@@ -9,5 +9,6 @@ install:
   - curl -L https://raw.githubusercontent.com/molovo/color/master/color.zsh > .bin/color
 before_script:
   - chmod u+x .bin/{color,revolver,zunit}
+  - chmod +x tests/_support/bin/*
   - export PATH="$PWD/.bin:$PATH"
-script: zunit
+script: zunit --verbose
