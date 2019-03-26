@@ -1,0 +1,120 @@
+#!/usr/bin/env zunit
+
+@setup {
+    load _support/docker
+    load ../appup.plugin.zsh
+    
+    _tmp_setup
+}
+
+@teardown {
+    _tmp_teardown
+}
+
+@test 'Docker restart' {
+    _setup_simple_env
+
+    run restart
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose restart'
+}
+
+@test 'Docker restart (with arguments)' {
+    _setup_simple_env
+
+    run restart mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose restart mysql -v'
+}
+
+@test 'Docker restart (without docker-compose file)' {
+    run restart
+    
+    assert $state equals 0
+    assert "$output" is_empty
+}
+
+@test 'Docker restart (with arguments, without docker-compose file)' {
+    run restart -d
+    
+    assert $state equals 0
+    assert "$output" is_empty
+}
+
+@test 'Docker restart (with project)' {
+    _setup_project_env foobar
+
+    run restart foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yml restart'
+}
+
+@test 'Docker restart (with project and arguments)' {
+    _setup_project_env foobar
+
+    run restart foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yml restart mysql -v'
+}
+
+@test 'Docker restart (with project, yaml extension)' {
+    _setup_project_env foobar yaml
+
+    run restart foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yaml -f docker-compose.foobar.yaml restart'
+}
+
+@test 'Docker restart (with project and arguments, yaml extension)' {
+    _setup_project_env foobar yaml
+
+    run restart foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yaml -f docker-compose.foobar.yaml restart mysql -v'
+}
+
+@test 'Docker restart (with project, yml/yaml extensions)' {
+    _setup_project_env foobar yaml
+    mv $APPUP_TMP/docker-compose.yaml $APPUP_TMP/docker-compose.yml
+
+    run restart foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yaml restart'
+}
+
+@test 'Docker restart (with project and arguments, yml/yaml extensions)' {
+    _setup_project_env foobar yaml
+    mv $APPUP_TMP/docker-compose.yaml $APPUP_TMP/docker-compose.yml
+
+    run restart foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -f docker-compose.yml -f docker-compose.foobar.yaml restart mysql -v'
+}
+
+@test 'Docker restart (with custom project name)' {
+    _setup_project_env foobar
+    echo "COMPOSE_PROJECT_NAME=test-project" > $APPUP_TMP/.env.foobar
+
+    run restart foobar
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -p test-project -f docker-compose.yml -f docker-compose.foobar.yml restart'
+}
+
+@test 'Docker restart (with custom project name and arguments)' {
+    _setup_project_env foobar
+    echo "COMPOSE_PROJECT_NAME=test-project" > $APPUP_TMP/.env.foobar
+
+    run restart foobar mysql -v
+    
+    assert $state equals 0
+    assert "$output" same_as 'docker-compose -p test-project -f docker-compose.yml -f docker-compose.foobar.yml restart mysql -v'
+}

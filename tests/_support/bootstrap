@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+export APPUP_TMP=/tmp/appup_test
+
+alias docker-compose='echo docker-compose'
+alias vagrant='echo vagrant'
+
+_tmp_setup () {
+    rm -Rf $APPUP_TMP
+    mkdir $APPUP_TMP
+}
+
+_tmp_teardown () {
+    rm -Rf $APPUP_TMP
+}
