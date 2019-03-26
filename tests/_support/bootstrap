@@ -1,9 +1,7 @@
 #!/usr/bin/env zsh
 
 export APPUP_TMP=/tmp/appup_test
-
-alias docker-compose='echo docker-compose'
-alias vagrant='echo vagrant'
+export PATH="${PWD}/tests/_support/bin:${PATH}"
 
 _tmp_setup () {
     rm -Rf $APPUP_TMP
