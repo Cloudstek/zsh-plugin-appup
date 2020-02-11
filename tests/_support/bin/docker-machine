@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+if [ "$1" = "status" ]; then
+	echo ${DM_STARTED:-Started}
+	return 0
+fi
+
+echo docker-machine "$@"
