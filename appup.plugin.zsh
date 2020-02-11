@@ -1,17 +1,41 @@
 # Docker
 _appup_docker () {
     if hash docker-compose >/dev/null 2>&1; then
-        # Check if docker-machine has been started
-        if hash docker-machine >/dev/null 2>&1; then            
-            if docker-machine status | grep -qi "Stopped"; then
-                read -q "REPLY?Docker Machine is not running, would you like to start it? [y/n] "
+        # Check if docker has been started
+        if [ "${APPUP_CHECK_STARTED:-true}" = true ]; then
+            if hash docker-machine >/dev/null 2>&1 && [ "${APPUP_DOCKER_MACHINE:-true}" = true ]; then            
+                if docker-machine status | grep -qi "Stopped"; then
+                    read -r -k 1 "REPLY?Docker Machine is not running, would you like to start it? [y/N] "
+                    echo ""
+                    
+                    if [[ "$REPLY" == "y" ]]; then
+                        docker-machine start default && eval $(docker-machine env default)
+                        echo ""
+                    else
+                        return 0
+                    fi
+                fi
+            elif docker ps 2>&1 | grep -qi "Is the docker daemon running?"; then
+                read -r -k 1 "REPLY?Docker for Mac is not running, would you like to start it? [y/N] "
                 echo ""
                 
                 if [[ "$REPLY" == "y" ]]; then
-                    docker-machine start default && eval $(docker-machine env default)
+                    open -a Docker
+                    
                     echo ""
+                    echo "Waiting for docker to start.."
+                    echo ""
+
+                    # Wait for it to start
+                    while true; do
+                        if docker ps 2>&1 | grep -qi "Is the docker daemon running?" || docker ps 2>&1 | grep -qi "connection refused"; then
+                            sleep 5
+                        else
+                            break
+                        fi
+                    done
                 else
-                    return
+                    return0
                 fi
             fi
         fi
@@ -65,6 +89,7 @@ _appup_vagrant () {
     fi
 }
 
+# Commands
 up () {
     if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
         _appup_docker up "$@"

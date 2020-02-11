@@ -49,3 +49,14 @@ Vagrant doesn't have a `down`, `restart`, `start` or `stop` commands natively bu
 
 1. Go to the directory where you cloned the plugin repository
 2. Run `git pull origin master`
+
+## Configuration options
+
+AppUp has a few configuration options to customise its behaviour. Please make sure you define these in `~/.zshrc` *before* you load any plugins.
+
+| Name                 | Values     | Default | Description                                                  |
+| -------------------- | ---------- | ------- | ------------------------------------------------------------ |
+| APPUP_CHECK_STARTED  | true/false | true    | Enable/disable checking if docker is running completely.     |
+| APPUP_DOCKER_MACHINE | true/false | true    | If both docker (e.g. Docker Desktop) and docker-machine are installed, check if docker-machine (when `true`) or docker (when `false`) is running. |
+|                      |            |         |                                                              |
+
