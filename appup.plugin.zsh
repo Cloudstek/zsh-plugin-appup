@@ -139,3 +139,13 @@ stop () {
         env stop "$@"
     fi
 }
+
+status () {
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
+        _appup_docker ps "$@"
+    elif [ -e "Vagrantfile" ]; then
+        _appup_vagrant status "$@"
+    elif hash status >/dev/null 2>&1; then
+        env status "$@"
+    fi
+}
