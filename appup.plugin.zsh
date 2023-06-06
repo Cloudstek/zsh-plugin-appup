@@ -40,41 +40,64 @@ _appup_docker () {
             fi
         fi
         
-        # Check YAML extension
+        # Find docker-compose file
         compose_file=''
-        compose_project_file=''
         
         if [ -e "docker-compose.yml" ]; then
             compose_file='docker-compose.yml'
         elif [ -e "docker-compose.yaml" ]; then
             compose_file='docker-compose.yaml'
         fi
+
+        # Env files
+        env_files=()
+
+        if [ "${APPUP_LOAD_ENVS:-true}" = true ]; then
+            if [ -e ".env" ]; then
+                env_files+=( .env )
+            fi
+            if [ -e ".env.local" ]; then
+                env_files+=( .env.local )
+            fi
+            if [ -e ".env.docker" ]; then
+                env_files+=( .env.docker )
+            fi
+            if [ -e ".env.docker.local" ]; then
+                env_files+=( .env.docker.local )
+            fi
+        fi
         
         # <cmd> <project name> will look for docker-compose.<project name>.yml
         if [ -n "$2" ]; then
+            # Find project-specific docker-compose file
+            compose_project_file=''
+
             if [ -e "docker-compose.$2.yml" ]; then
                 compose_project_file="docker-compose.$2.yml"
             elif [ -e "docker-compose.$2.yaml" ]; then
                 compose_project_file="docker-compose.$2.yaml"
             fi
-            
-            if [ -n "$compose_project_file" ]; then 
-                # Override project name from custom env
-                if [ -e ".env.$2" ]; then
-                    project=$(source ".env.$2"; echo $COMPOSE_PROJECT_NAME)
 
-                    if [ -n $project ]; then
-                        docker-compose -p "${project}" -f "$compose_file" -f "$compose_project_file" $1 "${@:3}"
-                        return
+            if [ -n "$compose_project_file" ]; then
+                # Project specific env file
+                if [ "${APPUP_LOAD_ENVS:-true}" = true ]; then
+                    if [ -e ".env.$2" ]; then
+                        env_files+=( ".env.$2" )
+                    fi
+                    if [ -e ".env.$2.local" ]; then
+                        env_files+=( ".env.$2.local" )
                     fi
                 fi
 
-                docker-compose -f "$compose_file" -f "$compose_project_file" $1 "${@:3}"
+                # Run docker compose.
+                docker-compose -f "$compose_file" -f "$compose_project_file" --env-file=$^env_files $1 "${@:3}"
+
                 return
             fi
         fi
 
-        docker-compose $1 "${@:2}"
+        # Run docker compose.
+        docker-compose --env-file=$^env_files $1 "${@:2}"
     else
         echo >&2 "Docker compose file found but docker-compose is not installed."
     fi
@@ -138,4 +161,18 @@ stop () {
     elif hash stop >/dev/null 2>&1; then
         env stop "$@"
     fi
+}
+
+enter () {
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
+        CMD=( "${@:2}" )
+
+        if [ $# -eq 1 ]; then
+            CMD=( /bin/bash -l )
+        fi
+
+        _appup_docker exec "$1" $CMD
+    elif hash enter >/dev/null 2>&1; then
+        env enter "$@"
+    fi   
 }
