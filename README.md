@@ -30,6 +30,7 @@ supplied to vagrant.
 | start   | [up](https://www.vagrantup.com/docs/cli/up.html)           | [start](https://docs.docker.com/compose/reference/start/)     |
 | restart | [reload](https://www.vagrantup.com/docs/cli/reload.html)   | [restart](https://docs.docker.com/compose/reference/restart/) |
 | stop    | [halt](https://www.vagrantup.com/docs/cli/halt.html)       | [stop](https://docs.docker.com/compose/reference/stop/)       |
+| enter   |                                                            | [exec](https://docs.docker.com/compose/reference/exec/) /bin/bash -l (or custom command/shell, e.g. with `enter /bin/sh`)      |
 
 ## Installation
 

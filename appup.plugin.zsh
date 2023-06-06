@@ -162,3 +162,17 @@ stop () {
         env stop "$@"
     fi
 }
+
+enter () {
+    if [ -e "docker-compose.yml" ] || [ -e "docker-compose.yaml" ]; then
+        CMD=( "${@:2}" )
+
+        if [ $# -eq 1 ]; then
+            CMD=( /bin/bash -l )
+        fi
+
+        _appup_docker exec "$1" $CMD
+    elif hash enter >/dev/null 2>&1; then
+        env enter "$@"
+    fi   
+}
